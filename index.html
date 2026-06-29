@@ -1339,13 +1339,10 @@
     window.addEventListener("keydown", e => { if (e.key === "Escape") closeLightbox(); });
 
     /* ─── WEATHER PROFILE FETCH ─── */
-    async function fetchLiveOmanWeather() {
-        const KEY  = "3552b98ddd30573d2e966b629e6952a5";
-        const URL  = `https://api.openweathermap.org/data/2.5/weather?q=Muscat&appid=${KEY}&units=metric`;
-        try {
-            const r    = await fetch(URL);
-            if (!r.ok) throw new Error();
-            const d    = await r.json();
+    async function fetchLiveOmanWeather() {  try {
+    const r = await fetch('/.netlify/functions/weather');
+    if (!r.ok) throw new Error();
+    const d = await r.json();
             document.getElementById("wpTemp").innerText     = `${Math.round(d.main.temp)}°C`;
             document.getElementById("wpHumidity").innerText = `${d.main.humidity}% RH`;
             document.getElementById("wpWind").innerText     = `${(d.wind.speed * 3.6).toFixed(1)} KM/H`;
@@ -1364,8 +1361,6 @@
     /* ─── UPGRADED COPERNICUS S5P MAPPED MASTERPIECE INFOGRAPHIC ENGINE ─── */
     async function generateLocalWeatherReport() {
         const btnTxt = document.getElementById("txt-weather-btn");
-        const KEY    = "3552b98ddd30573d2e966b629e6952a5";
-        
         if (!navigator.geolocation) { alert("Geolocation unsupported."); return; }
         btnTxt.innerText = "READING_GPS...";
         
@@ -1374,14 +1369,10 @@
             btnTxt.innerText = "COORDINATING_FEEDS...";
             
             try {
-                const weatherReq = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${KEY}&units=metric`);
-                const pollutionReq = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${KEY}`);
-                
-                if (!weatherReq.ok || !pollutionReq.ok) throw new Error();
-                
-                const d = await weatherReq.json();
-                const pData = await pollutionReq.json();
-                
+            const localReq = await fetch(`/.netlify/functions/weather-local?lat=${lat}&lon=${lon}`);
+const localData = await localReq.json();
+const d = localData.weather;
+const pData = localData.pollution;
                 const sector  = (d.name || "UNKNOWN").toUpperCase();
                 const country = (d.sys.country || "GLOBAL").toUpperCase();
                 
